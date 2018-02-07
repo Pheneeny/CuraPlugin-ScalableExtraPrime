@@ -1,8 +1,8 @@
 # Copyright (c) 2018 Pheneeny
-# The LinearExtraPrime plugin is released under the terms of the AGPLv3 or higher.
+# The ScalableExtraPrime plugin is released under the terms of the AGPLv3 or higher.
 
 import unittest
-import LinearExtraPrimeAdjuster as lepa
+import ScalableExtraPrimeAdjuster as lepa
 
 gcode1 = "G1 X82.559 Y142.583 E510.05313"
 gcode2 = "G1 F1500 E503.55313"
@@ -14,7 +14,7 @@ g3split = lepa.split_gcode(gcode3)
 g4split = lepa.split_gcode(gcode4)
 
 
-class TestLinearPrimeAdjusterTest(unittest.TestCase):
+class TestScalablePrimeAdjusterTest(unittest.TestCase):
 
     def test_split_gcode(self):
 

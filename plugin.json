@@ -1,5 +1,5 @@
 {
-    "name": "Linear Extra Prime",
+    "name": "Scalable Extra Prime",
     "author": "Pheneeny",
     "version": "1.0.0",
     "description": "Adjusts the extra prime amount after a travel or retraction based on the distance traveled",

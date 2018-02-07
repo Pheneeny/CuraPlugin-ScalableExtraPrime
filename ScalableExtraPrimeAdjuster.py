@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Pheneeny
-# The LinearExtraPrime plugin is released under the terms of the AGPLv3 or higher.
+# The ScalableExtraPrime plugin is released under the terms of the AGPLv3 or higher.
 
 from math import sqrt
 from collections import namedtuple
