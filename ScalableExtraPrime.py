@@ -124,7 +124,6 @@ class ScalableExtraPrime(Extension):
         self._global_container_stack = self._application.getGlobalContainerStack()
 
     def _filterGcode(self, output_device):
-        Logger.log("d", "******filtering gcode");
 
         scene = self._application.getController().getScene()
         # get settings from Cura
