@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Pheneeny
-# The LinearExtraPrime plugin is released under the terms of the AGPLv3 or higher.
+# The ScalableExtraPrime plugin is released under the terms of the AGPLv3 or higher.
 
 import os, json, re
 
@@ -11,13 +11,13 @@ from UM.Settings.ContainerRegistry import ContainerRegistry
 from UM.Logger import Logger
 
 from math import sqrt
-from . import LinearExtraPrimeAdjuster
+from . import ScalableExtraPrimeAdjuster
 
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("LinearExtraPrime")
+i18n_catalog = i18nCatalog("ScalableExtraPrime")
 
 
-class LinearExtraPrime(Extension):
+class ScalableExtraPrime(Extension):
     def __init__(self):
         super().__init__()
 
@@ -25,7 +25,7 @@ class LinearExtraPrime(Extension):
 
         self._i18n_catalog = None
 
-        self._min_travel_key = "linear_prime_min_travel"
+        self._min_travel_key = "scalable_prime_min_travel"
         self._min_travel_dict = {
             "label": "Extra Prime Min Travel",
             "description": "Minimum distance of travel before adding extra prime",
@@ -38,19 +38,19 @@ class LinearExtraPrime(Extension):
             "settable_per_meshgroup": False
         }
 
-        self._max_travel_key = "linear_prime_max_travel"
+        self._max_travel_key = "scalable_prime_max_travel"
         self._max_travel_dict = {
             "label": "Extra Prime Max Travel",
             "description": "Maximum travel distance to scale extra prime",
             "type": "float",
             "unit": "mm",
             "default_value": 200,
-            "minimum_value": "linear_prime_min_travel",
+            "minimum_value": "scalable_prime_min_travel",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
         }
-        self._min_prime_key = "linear_prime_min_amount"
+        self._min_prime_key = "scalable_prime_min_amount"
         self._min_prime_dict = {
             "label": "Min Extra Prime",
             "description": "Minimum amount of filament to add when priming after a retraction or travel",
@@ -61,19 +61,19 @@ class LinearExtraPrime(Extension):
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
         }
-        self._max_prime_key = "linear_prime_max_amount"
+        self._max_prime_key = "scalable_prime_max_amount"
         self._max_prime_dict = {
             "label": "Max Extra Prime",
             "description": "Maximum amount of filament to add when priming after a retraction or travel",
             "type": "float",
             "unit": "mm",
             "default_value": 0,
-            "minimum_value": "linear_prime_min_amount",
+            "minimum_value": "scalable_prime_min_amount",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
         }
-        self._enable_all_travels_key = "linear_prime_enable_all_travels"
+        self._enable_all_travels_key = "scalable_prime_enable_all_travels"
         self._enable_all_travels_dict = {
             "label": "Enable For All Travels",
             "description": "Disabling this sets the slicer to only add extra filament after a retraction. If combing is enabled, travels over infill may not retract, and won't trigger extra prime.",
@@ -84,7 +84,7 @@ class LinearExtraPrime(Extension):
             "settable_per_extruder": False,
             "settable_per_meshgroup": False,
         }
-        self._setting_key = "linear_prime_enable"
+        self._setting_key = "scalable_prime_enable"
         self._setting_dict = {
             "label": "Enable Linear Extra Prime",
             "description": "Adds extra filament extrusion after a retraction or travel, scaling it based on the distance of the travel. This can help resolve filament oozing out during a travel, leaving a void in the nozzle and causing under extrusion when extrusion resumes",
@@ -128,8 +128,8 @@ class LinearExtraPrime(Extension):
 
         scene = self._application.getController().getScene()
         # get settings from Cura
-        linear_enabled = self._global_container_stack.getProperty(self._setting_key, "value")
-        if not linear_enabled:
+        scalable_enabled = self._global_container_stack.getProperty(self._setting_key, "value")
+        if not scalable_enabled:
             return
 
         min_travel = self._global_container_stack.getProperty(self._min_travel_key, "value")
@@ -150,7 +150,7 @@ class LinearExtraPrime(Extension):
                 continue
 
             if ";EOFFSETPROCESSED" not in gcode_list[0]:
-                gcode_list = LinearExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction)
+                gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction)
 
                 gcode_list[0] += ";EOFFSETPROCESSED\n"
                 gcode_dict[plate_id] = gcode_list
