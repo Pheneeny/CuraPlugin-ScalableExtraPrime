@@ -3,7 +3,7 @@
 
 from . import ScalableExtraPrime
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("LinearExtraPrime")
+i18n_catalog = i18nCatalog("ScalableExtraPrime")
 
 def getMetaData():
     return {}
