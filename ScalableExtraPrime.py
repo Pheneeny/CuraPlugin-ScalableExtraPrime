@@ -86,7 +86,7 @@ class ScalableExtraPrime(Extension):
         }
         self._setting_key = "scalable_prime_enable"
         self._setting_dict = {
-            "label": "Enable Linear Extra Prime",
+            "label": "Enable Scalable Extra Prime",
             "description": "Adds extra filament extrusion after a retraction or travel, scaling it based on the distance of the travel. This can help resolve filament oozing out during a travel, leaving a void in the nozzle and causing under extrusion when extrusion resumes",
             "type": "bool",
             "unit": "",
@@ -164,7 +164,7 @@ class ScalableExtraPrime(Extension):
         parent_category = container.findDefinitions(key=parent)
         definition = container.findDefinitions(key=setting_key)
         if parent_category and not definition:
-            # this machine doesn't have a linear extra prime setting yet
+            # this machine doesn't have a scalable extra prime setting yet
             parent_category = parent_category[0]
             setting_definition = SettingDefinition(setting_key, container, parent_category, self._i18n_catalog)
             setting_definition.deserialize(setting_dict)
