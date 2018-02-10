@@ -33,6 +33,7 @@ class ScalableExtraPrime(Extension):
             "unit": "mm",
             "default_value": 0,
             "minimum_value": 0,
+            "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
@@ -46,6 +47,7 @@ class ScalableExtraPrime(Extension):
             "unit": "mm",
             "default_value": 200,
             "minimum_value": "scalable_prime_min_travel",
+            "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
@@ -57,6 +59,8 @@ class ScalableExtraPrime(Extension):
             "type": "float",
             "unit": "mm",
             "default_value": 0,
+            "minimum_value": 0,
+            "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
@@ -69,6 +73,7 @@ class ScalableExtraPrime(Extension):
             "unit": "mm",
             "default_value": 0,
             "minimum_value": "scalable_prime_min_amount",
+            "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
@@ -80,6 +85,7 @@ class ScalableExtraPrime(Extension):
             "type": "bool",
             "unit": "",
             "default_value": True,
+            "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
             "settable_per_meshgroup": False,
