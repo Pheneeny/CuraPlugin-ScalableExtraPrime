@@ -8,7 +8,7 @@ This causes under-extrusion when printing starts again at the end of the travel.
 but the existing option in Cura sets a single amount of prime on any retraction, no matter how long the travel is. This plugin addresses this issue by
  scaling the amount of extra filament to prime the nozzle with based on the distance that is traveled between extrusions.
  
-This plugin modifies the gcode that is created by Cura by tracking all travel moves and inserting additional filament extrusion at the end of the move.
+This plugin modifies the gcode that is created by Cura by tracking all travel moves and inserting additional filament extrusion at the end of the move. If you also use the built in [Retraction Extra Prime Amount] setting, this plugin will add additional filament on top of the extra added by that setting. There should be no reason to use [Retraction Extra Prime Amount] when using this plugin.
 
 The amount of filament added is scaled linearly, roughly using this equation:
 
@@ -30,3 +30,6 @@ extra filament = ((actual_travel - min_travel) / ( max_travel - min_travel)) * (
 
 ##### Max Extra Prime
 * The maximum amount of filament to add after a travel
+
+##### Enable For All Travels
+* Enable scaled extra prime for all travels. If this is disabled, extra prime will only be added after retractions
