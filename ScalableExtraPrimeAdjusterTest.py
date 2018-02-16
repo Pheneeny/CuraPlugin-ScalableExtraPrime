@@ -191,6 +191,40 @@ G1 X10.00 Y0.00 E10.2
         output = output[2]
         self.assertEqual(expected_output, output)
 
+    def test_parse_gcode_with_G92(self):
+        gcode = '''G1 X10.00 Y0.00 E2.00
+G1 X10.000 Y10.00 E4.00
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.00
+G92 E0
+G1 X10.00 Y0.00 E2.00
+G1 X10.000 Y10.00 E4.00
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.00
+G1 X10.00 Y0.00 E6.00
+'''
+        expected_output='''G1 X10.00 Y0.00 E2.0
+G1 X10.000 Y10.00 E4.0
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.2 ;Adjusted e by 0.2mm
+G92 E0
+G1 X10.00 Y0.00 E2.0
+G1 X10.000 Y10.00 E4.0
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.2 ;Adjusted e by 0.2mm
+G1 X10.00 Y0.00 E6.2
+'''
+        output = lepa.parse_and_adjust_gcode(["","",gcode], 0,200,0,2)
+        output = output[2]
+        self.assertEqual(expected_output, output)
 
 if __name__ == "__main__":
     unittest.main()
