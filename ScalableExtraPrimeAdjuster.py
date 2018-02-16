@@ -40,6 +40,13 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
 
             # Handle movement command
             if command == 'G':
+                #Handle resetting E position
+                if command_value == '92':
+                    e_val = get_e_from_split(split_g)
+                    if e_val is not None:
+                        last_e = e_val
+                        adjusted_e = e_val
+                        continue
                 # Handle travel
                 if command_value == '0':
                     current_point = get_point_from_split(split_g)
