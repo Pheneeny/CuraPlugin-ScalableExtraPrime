@@ -226,5 +226,12 @@ G1 X10.00 Y0.00 E6.2
         output = output[2]
         self.assertEqual(expected_output, output)
 
+
+    def test_args_in_comment(self):
+        gcode = "G1 X1 Y280 ;move along X-Y"
+        split = lepa.split_gcode(gcode)
+        point = lepa.get_point_from_split(split)
+        self.assertEqual(point, lepa.Point(1, 280))
+
 if __name__ == "__main__":
     unittest.main()

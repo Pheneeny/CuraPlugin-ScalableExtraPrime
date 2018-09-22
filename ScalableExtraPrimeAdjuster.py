@@ -173,6 +173,8 @@ def get_point_from_split(args:[GCodeArg])->Point:
             x = float(value)
         elif attr == 'Y':
             y = float(value)
+        elif attr == ';':
+            break;
 
     if x is None or y is None:
         return None;
