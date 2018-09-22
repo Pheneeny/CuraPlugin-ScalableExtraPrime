@@ -24,10 +24,16 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
     if min_prime > max_prime:
         min_prime, max_prime = max_prime, min_prime
 
+    num_layers = len(gcode_layers)
     for layer, gcode_layer in enumerate(gcode_layers):
         # gcode_list[2] is the first layer, after the preamble and the start gcode
         if layer < 2:
             continue
+
+        # Skip the last layer
+        if layer >= num_layers - 1:
+            continue
+
         lines = gcode_layer.split("\n");
         for (line_nr, line) in enumerate(lines):
 
