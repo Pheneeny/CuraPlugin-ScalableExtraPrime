@@ -104,7 +104,7 @@ G0 F7200 X0.00 Y0.00
 G1 E8.4 ;Adjusted e by 0.2mm
 G1 X10.00 Y0.00 E10.4
 '''
-        output = lepa.parse_and_adjust_gcode(["","",gcode], 0,200,0,2)
+        output = lepa.parse_and_adjust_gcode(["","",gcode, ""], 0,200,0,2)
         output = output[2]
         self.assertEqual(expected_output, output)
 
@@ -131,7 +131,7 @@ G0 F7200 X0.00 Y0.00
 G1 E8.4 ;Adjusted e by 0.2mm
 G1 X10.00 Y0.00 E10.4
 '''
-        output = lepa.parse_and_adjust_gcode(["","",gcode], 0, 200, 0, 2, True)
+        output = lepa.parse_and_adjust_gcode(["","",gcode, ""], 0, 200, 0, 2, True)
         output = output[2]
         self.assertEqual(expected_output, output)
 
@@ -157,7 +157,7 @@ G0 F7200 X0.00 Y10.00
 G0 F7200 X0.00 Y0.00
 G1 X10.00 Y0.00 E10.0
 '''
-        output = lepa.parse_and_adjust_gcode(["","",gcode], 0, 200, 0, 2, False)
+        output = lepa.parse_and_adjust_gcode(["","",gcode, ""], 0, 200, 0, 2, False)
         output = output[2]
         self.assertEqual(expected_output, output)
 
@@ -187,7 +187,7 @@ G0 F7200 X0.00 Y10.0
 G0 F7200 X0.00 Y0.0
 G1 X10.00 Y0.00 E10.2
 '''
-        output = lepa.parse_and_adjust_gcode(["","",gcode], 0, 200, 0, 2, False)
+        output = lepa.parse_and_adjust_gcode(["","",gcode, ""], 0, 200, 0, 2, False)
         output = output[2]
         self.assertEqual(expected_output, output)
 
@@ -222,7 +222,7 @@ G0 F7200 X0.00 Y0.00
 G1 E4.2 ;Adjusted e by 0.2mm
 G1 X10.00 Y0.00 E6.2
 '''
-        output = lepa.parse_and_adjust_gcode(["","",gcode], 0,200,0,2)
+        output = lepa.parse_and_adjust_gcode(["","",gcode, ""], 0,200,0,2)
         output = output[2]
         self.assertEqual(expected_output, output)
 
@@ -232,6 +232,45 @@ G1 X10.00 Y0.00 E6.2
         split = lepa.split_gcode(gcode)
         point = lepa.get_point_from_split(split)
         self.assertEqual(point, lepa.Point(1, 280))
+
+    def test_parse_gcode_with_G91_last_layer(self):
+        self.maxDiff = None;
+        gcode = '''G1 X10.00 Y0.00 E2.00
+G1 X10.000 Y10.00 E4.00
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.00
+G92 E0
+G1 X10.00 Y0.00 E2.00
+G1 X10.000 Y10.00 E4.00
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.00
+G1 X10.00 Y0.00 E6.00
+'''
+        expected_output = '''G1 X10.00 Y0.00 E2.0
+G1 X10.000 Y10.00 E4.0
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.2 ;Adjusted e by 0.2mm
+G92 E0
+G1 X10.00 Y0.00 E2.0
+G1 X10.000 Y10.00 E4.0
+G1 F1500 E3.5
+G0 F7200 X0.00 Y10.00
+G0 F7200 X0.00 Y0.00
+G1 E4.2 ;Adjusted e by 0.2mm
+G1 X10.00 Y0.00 E6.2
+'''
+        last_layer = '''G91
+G1 E-2 F300
+'''
+        output = lepa.parse_and_adjust_gcode(["", "", gcode, last_layer], 0, 200, 0, 2)
+        self.assertEqual(expected_output, output[2])
+        self.assertEqual(last_layer, output[3])
 
 if __name__ == "__main__":
     unittest.main()
