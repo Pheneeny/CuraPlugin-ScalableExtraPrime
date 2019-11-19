@@ -8,7 +8,7 @@ pluginjson = json.load(open("./plugin.json"));
 
 package_name = pluginjson["name"].strip().replace(" ", "")
 packege_dir = package_name + "/"
-plugin_file = package_name + ".curaplugin"
+plugin_file = package_name + '.curapackage'
 
 if plugin_file in os.listdir(root):
     os.remove(plugin_file)
