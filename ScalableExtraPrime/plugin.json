@@ -6,6 +6,6 @@
   "version": "1.0.2",
   "description": "Adjusts the extra prime amount after a travel or retraction based on the distance traveled",
   "api": 5,
-  "supported_sdk_versions": ["5.0.0", "6.0.0", "6.1.0", "6.2.0", "6.3.0", "7.0.0"],
+  "supported_sdk_versions": ["5.0.0", "6.0.0", "6.1.0", "6.2.0", "6.3.0", "7.0.0", "7.1.0", "7.2.0", "7.3.0"],
   "i18n-catalog": "ScalableExtraPrime"
 }
