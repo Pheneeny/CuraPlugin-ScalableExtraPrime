@@ -131,7 +131,7 @@ class ScalableExtraPrime(Extension):
             # skip extruder definitions
             return
 
-        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "material")
+        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "travel")
         self.create_and_attach_setting(container, self._min_travel_key, self._min_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._max_travel_key, self._max_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._min_prime_key, self._min_prime_dict, self._setting_key)

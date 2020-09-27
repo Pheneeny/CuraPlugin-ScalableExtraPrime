@@ -17,6 +17,7 @@ Original concept and version by github user [Pheneey](https://github.com/Pheneen
 Updated and maintained to support newer versions of Cura.
 
 ### Settings
+* Located in the Travel category
 
 ##### Enable Scalable Extra Prime
 * Enables scalable extra prime. If this is false, no extra prime is added by the plugin  
