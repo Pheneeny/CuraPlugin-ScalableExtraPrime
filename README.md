@@ -42,3 +42,6 @@ This has been tested on Cura 3.2.0. through 4.7.1
 ### Installation
 MacOS: Copy plugin folder to /Users/USERNAME/Library/Application Support/cura/VERSION/plugins
 Windows:
+
+Alternatively you can download the following [curapackage](https://github.com/Funkton/CuraPlugin-ScalableExtraPrime/releases/download/1.0.2/ScalableExtraPrime-v7.3.0.curapackage) file Cura 4.7, drag and drop into Cura, then restart.
+
