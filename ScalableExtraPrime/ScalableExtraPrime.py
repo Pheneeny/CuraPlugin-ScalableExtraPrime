@@ -155,7 +155,7 @@ class ScalableExtraPrime(Extension):
         min_prime = self._global_container_stack.getProperty(self._min_prime_key, "value")
         max_prime = self._global_container_stack.getProperty(self._max_prime_key, "value")
         extra_prime_without_retraction = self._global_container_stack.getProperty(self._enable_all_travels_key, "value")
-        extra_prime_only_travels = self._global_container_stack.getProperty(self._enable_onle_travels_key, "value")
+        extra_prime_only_travels = self._global_container_stack.getProperty(self._enable_only_travels_key, "value")
 
         gcode_dict = getattr(scene, "gcode_dict", {})
         if not gcode_dict:  # this also checks for an empty dict
