@@ -34,7 +34,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
         if layer >= num_layers - 1:
             continue
 
-        lines = gcode_layer.split('\n')
+        lines = gcode_layer.split("\n");
         for (line_nr, line) in enumerate(lines):
 
             # Check if line is empty or a comment
@@ -83,17 +83,17 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
                     extra_move = None
 
                     #Check if this is the first extrude after a travel
-                    if current_travel != 0 and ((current_retraction != 0 and not extra_prime_only_travels) or extra_prime_without_retraction or (current_retraction == 0 and extra_prime_only_travels))
+                    if current_travel != 0 and ((current_retraction != 0 and not extra_prime_only_travels) or extra_prime_without_retraction or (current_retraction == 0 and extra_prime_only_travels)):
                         #Calculate extra prime based on travel distance
                         extra_e = round(get_extra_e(min_travel, max_travel, min_prime, max_prime, current_travel), 5)
-                        adjusted_e += extra_e
+                        adjusted_e += extra_e;
 
                         if extra_e != 0:
-                            adjustment_message = 'Adjusted e by {}mm'.format(extra_e)
+                            adjustment_message = "Adjusted e by {}mm".format(extra_e);
 
                             #If this move wasn't a prime after a retraction, create a move that we will inject later
                             if current_retraction == 0 and get_point_from_split(split_g) is not None:
-                                extra_move = 'G1 E{} ;{}\n'.format(round(adjusted_e, 5), adjustment_message)
+                                extra_move = "G1 E{} ;{}\n".format(round(adjusted_e, 5), adjustment_message)
                                 adjustment_message = None
 
                     #Adjust for current move extrusion
@@ -103,7 +103,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
                     set_e_in_split(split_g, adjusted_e)
 
                     #Generate new gcode
-                    new_gcode = combine_gcode(split_g, adjustment_message)
+                    new_gcode = combine_gcode(split_g, adjustment_message);
 
                     #If we created an extra move before, prepend it to the generated gcode
                     if extra_move:
@@ -118,7 +118,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
                         current_retraction = 0
 
                     last_e = current_e
-        gcode_layers[layer] = '\n'.join(lines)
+        gcode_layers[layer] = "\n".join(lines)
     return gcode_layers
 
 
@@ -137,9 +137,9 @@ def get_extra_e(min_travel:float, max_travel:float, min_prime:float, max_prime:f
         return max_prime
 
     possible_travel_range = max_travel - min_travel
-    actual_travel = actual_travel - min_travel
+    actual_travel = actual_travel - min_travel;
 
-    travel_percent = actual_travel / possible_travel_range
+    travel_percent = actual_travel / possible_travel_range;
 
     possible_prime_range = max_prime - min_prime
 
@@ -150,10 +150,10 @@ def get_extra_e(min_travel:float, max_travel:float, min_prime:float, max_prime:f
 def split_gcode(g_command:str)->[GCodeArg]:
     if ';' in g_command:
         comment_index = g_command.find(';')
-        if comment_index > 0 and g_command[comment_index-1] != ' ':
-            g_command = g_command.replace(';', ' ;')
-    args = g_command.strip().split(' ')
-    parsed = []
+        if comment_index > 0 and g_command[comment_index-1] != " ":
+            g_command = g_command.replace(";", " ;")
+    args = g_command.strip().split(" ");
+    parsed = [];
     for arg in args:
         if len(arg) > 1:
             parsed.append(GCodeArg(arg[0], arg[1:]))
@@ -161,18 +161,18 @@ def split_gcode(g_command:str)->[GCodeArg]:
 
 
 def combine_gcode(args:[GCodeArg], comment:str=None)-> [str]:
-    gcode_line = ''
+    gcode_line = ""
     for arg in args:
-        gcode_line += arg.name + str(arg.value) + ' '
+        gcode_line += arg.name + str(arg.value) + " "
     gcode_line = gcode_line.strip()
     if comment:
-        gcode_line += ' ;' + comment
-    return gcode_line
+        gcode_line += " ;" + comment
+    return gcode_line;
 
 
 def get_point_from_split(args:[GCodeArg])->Point:
-    x = None
-    y = None
+    x = None;
+    y = None;
     for arg in args:
         attr, value = arg
         if attr == 'X':
@@ -180,10 +180,10 @@ def get_point_from_split(args:[GCodeArg])->Point:
         elif attr == 'Y':
             y = float(value)
         elif attr == ';':
-            break
+            break;
 
     if x is None or y is None:
-        return None
+        return None;
 
     return Point(x, y)
 
@@ -199,14 +199,14 @@ def get_e_from_split(args:[GCodeArg])->float:
 
 def set_e_in_split(args:[GCodeArg], e_value:float)->[GCodeArg]:
     e_value = round(e_value, 5)
-    adjusted_arg = GCodeArg('E', str(e_value))
+    adjusted_arg = GCodeArg("E", str(e_value))
     for arg_n, arg in enumerate(args):
-        if arg.name == 'E':
+        if arg.name == "E":
             args[arg_n] = adjusted_arg
 
     return args
 
 
 def get_distance(point1:Point, point2:Point):
-    return sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
+    return sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2);
 
