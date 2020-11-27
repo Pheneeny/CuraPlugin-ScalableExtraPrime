@@ -78,10 +78,22 @@ class ScalableExtraPrime(Extension):
             "settable_per_extruder": False,
             "settable_per_meshgroup": False
         }
-        self._enable_all_travels_key = "scalable_prime_enable_all_travels"
-        self._enable_all_travels_dict = {
-            "label": "Enable For All Travels",
-            "description": "Disabling this sets the slicer to only add extra filament after a retraction. If combing is enabled, travels over infill may not retract, and won't trigger extra prime.",
+        self._enable_retraction_travels_key = "scalable_prime_enable_retraction_travels"
+        self._enable_retraction_travels_dict = {
+            "label": "Travels With Retraction",
+            "description": "Enables slicer to add extra filament after a travel that was preceded by a retraction.",
+            "type": "bool",
+            "unit": "",
+            "default_value": True,
+            "enabled": "scalable_prime_enable",
+            "settable_per_mesh": False,
+            "settable_per_extruder": False,
+            "settable_per_meshgroup": False,
+        }
+        self._enable_no_retraction_travels_key = "scalable_prime_enable_no_retraction_travels"
+        self._enable_no_retraction_travels_dict = {
+            "label": "Travels Without Retraction",
+            "description": "Enables slicer to add extra filament after a travel that was not preceded by a retraction.",
             "type": "bool",
             "unit": "",
             "default_value": True,
@@ -119,12 +131,13 @@ class ScalableExtraPrime(Extension):
             # skip extruder definitions
             return
 
-        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "material")
+        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "travel")
         self.create_and_attach_setting(container, self._min_travel_key, self._min_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._max_travel_key, self._max_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._min_prime_key, self._min_prime_dict, self._setting_key)
         self.create_and_attach_setting(container, self._max_prime_key, self._max_prime_dict, self._setting_key)
-        self.create_and_attach_setting(container, self._enable_all_travels_key, self._enable_all_travels_dict, self._setting_key)
+        self.create_and_attach_setting(container, self._enable_retraction_travels_key, self._enable_retraction_travels_dict, self._setting_key)
+        self.create_and_attach_setting(container, self._enable_no_retraction_travels_key, self._enable_no_retraction_travels_dict, self._setting_key)
 
     def _onGlobalContainerStackChanged(self):
         self._global_container_stack = self._application.getGlobalContainerStack()
@@ -141,7 +154,8 @@ class ScalableExtraPrime(Extension):
         max_travel = self._global_container_stack.getProperty(self._max_travel_key, "value")
         min_prime = self._global_container_stack.getProperty(self._min_prime_key, "value")
         max_prime = self._global_container_stack.getProperty(self._max_prime_key, "value")
-        extra_prime_without_retraction = self._global_container_stack.getProperty(self._enable_all_travels_key, "value")
+        extra_prime_with_retraction = self._global_container_stack.getProperty(self._enable_retraction_travels_key, "value")
+        extra_prime_without_retraction = self._global_container_stack.getProperty(self._enable_no_retraction_travels_key, "value")
 
         gcode_dict = getattr(scene, "gcode_dict", {})
         if not gcode_dict:  # this also checks for an empty dict
@@ -155,7 +169,7 @@ class ScalableExtraPrime(Extension):
                 continue
 
             if ";EOFFSETPROCESSED" not in gcode_list[0]:
-                gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction)
+                gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_with_retraction, extra_prime_without_retraction)
 
                 gcode_list[0] += ";EOFFSETPROCESSED\n"
                 gcode_dict[plate_id] = gcode_list

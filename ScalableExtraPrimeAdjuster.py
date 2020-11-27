@@ -8,7 +8,7 @@ Point = namedtuple('Point', 'x y')
 GCodeArg = namedtuple('GCodeArg', 'name value')
 
 
-def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:float, min_prime:float, max_prime:float, extra_prime_without_retraction:bool=True)->([str], float):
+def parse_and_adjust_gcode(gcode_layers: [[str]], min_travel: float, max_travel: float, min_prime: float, max_prime: float, extra_prime_with_retraction:bool = True, extra_prime_without_retraction: bool = True) -> ([str], float):
 
     last_point = None
 
@@ -34,7 +34,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
         if layer >= num_layers - 1:
             continue
 
-        lines = gcode_layer.split("\n");
+        lines = gcode_layer.split("\n")
         for (line_nr, line) in enumerate(lines):
 
             # Check if line is empty or a comment
@@ -46,7 +46,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
 
             # Handle movement command
             if command == 'G':
-                #Handle resetting E position
+                # Handle resetting E position
                 if command_value == '92':
                     e_val = get_e_from_split(split_g)
                     if e_val is not None:
@@ -72,40 +72,39 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
                     if current_point is not None:
                         last_point = current_point
 
-                    #No extrusion on this G1?
+                    # No extrusion on this G1?
                     if current_e is None:
                         continue
-
 
                     e_diff = current_e - last_e
 
                     adjustment_message = None
                     extra_move = None
 
-                    #Check if this is the first extrude after a travel
-                    if current_travel != 0 and (current_retraction != 0 or extra_prime_without_retraction):
-                        #Calculate extra prime based on travel distance
+                    # Check if this is the first extrude after a travel
+                    if should_add_extra_filament(current_travel, current_retraction, extra_prime_with_retraction, extra_prime_without_retraction):
+                        # Calculate extra prime based on travel distance
                         extra_e = round(get_extra_e(min_travel, max_travel, min_prime, max_prime, current_travel), 5)
-                        adjusted_e += extra_e;
+                        adjusted_e += extra_e
 
                         if extra_e != 0:
-                            adjustment_message = "Adjusted e by {}mm".format(extra_e);
+                            adjustment_message = "Adjusted e by {}mm".format(extra_e)
 
-                            #If this move wasn't a prime after a retraction, create a move that we will inject later
+                            # If this move wasn't a prime after a retraction, create a move that we will inject later
                             if current_retraction == 0 and get_point_from_split(split_g) is not None:
                                 extra_move = "G1 E{} ;{}\n".format(round(adjusted_e, 5), adjustment_message)
                                 adjustment_message = None
 
-                    #Adjust for current move extrusion
+                    # Adjust for current move extrusion
                     adjusted_e += e_diff
 
-                    #Set adjusted value for the current move
+                    # Set adjusted value for the current move
                     set_e_in_split(split_g, adjusted_e)
 
-                    #Generate new gcode
-                    new_gcode = combine_gcode(split_g, adjustment_message);
+                    # Generate new gcode
+                    new_gcode = combine_gcode(split_g, adjustment_message)
 
-                    #If we created an extra move before, prepend it to the generated gcode
+                    # If we created an extra move before, prepend it to the generated gcode
                     if extra_move:
                         new_gcode = extra_move + new_gcode
 
@@ -122,24 +121,24 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
     return gcode_layers
 
 
-def get_extra_e(min_travel:float, max_travel:float, min_prime:float, max_prime:float, actual_travel:float)->float:
+def get_extra_e(min_travel: float, max_travel: float, min_prime: float, max_prime: float, actual_travel: float) -> float:
 
-    #If we didn't travel at least the min distance, return 0 extra e
+    # If we didn't travel at least the min distance, return 0 extra e
     if actual_travel == 0 or actual_travel < min_travel:
         return 0
 
-    #If actual travel is min_travel, return min_prime.
+    # If actual travel is min_travel, return min_prime.
     if actual_travel == min_travel:
         return min_prime
 
-    #If we traveled further than our max, return max_prime. This also avoid divide by 0 if min_travel == max_travel
+    # If we traveled further than our max, return max_prime. This also avoid divide by 0 if min_travel == max_travel
     if actual_travel > max_travel:
         return max_prime
 
     possible_travel_range = max_travel - min_travel
-    actual_travel = actual_travel - min_travel;
+    actual_travel = actual_travel - min_travel
 
-    travel_percent = actual_travel / possible_travel_range;
+    travel_percent = actual_travel / possible_travel_range
 
     possible_prime_range = max_prime - min_prime
 
@@ -147,32 +146,32 @@ def get_extra_e(min_travel:float, max_travel:float, min_prime:float, max_prime:f
     return extra_e
 
 
-def split_gcode(g_command:str)->[GCodeArg]:
+def split_gcode(g_command: str) -> [GCodeArg]:
     if ';' in g_command:
         comment_index = g_command.find(';')
         if comment_index > 0 and g_command[comment_index-1] != " ":
             g_command = g_command.replace(";", " ;")
-    args = g_command.strip().split(" ");
-    parsed = [];
+    args = g_command.strip().split(" ")
+    parsed = []
     for arg in args:
         if len(arg) > 1:
             parsed.append(GCodeArg(arg[0], arg[1:]))
     return parsed
 
 
-def combine_gcode(args:[GCodeArg], comment:str=None)-> [str]:
+def combine_gcode(args: [GCodeArg], comment: str = None) -> [str]:
     gcode_line = ""
     for arg in args:
         gcode_line += arg.name + str(arg.value) + " "
     gcode_line = gcode_line.strip()
     if comment:
         gcode_line += " ;" + comment
-    return gcode_line;
+    return gcode_line
 
 
-def get_point_from_split(args:[GCodeArg])->Point:
-    x = None;
-    y = None;
+def get_point_from_split(args: [GCodeArg]) -> Point:
+    x = None
+    y = None
     for arg in args:
         attr, value = arg
         if attr == 'X':
@@ -180,15 +179,15 @@ def get_point_from_split(args:[GCodeArg])->Point:
         elif attr == 'Y':
             y = float(value)
         elif attr == ';':
-            break;
+            break
 
     if x is None or y is None:
-        return None;
+        return None
 
     return Point(x, y)
 
 
-def get_e_from_split(args:[GCodeArg])->float:
+def get_e_from_split(args: [GCodeArg]) -> float:
     for arg in args:
         attr, value = arg
         if attr == 'E':
@@ -197,7 +196,7 @@ def get_e_from_split(args:[GCodeArg])->float:
     return None
 
 
-def set_e_in_split(args:[GCodeArg], e_value:float)->[GCodeArg]:
+def set_e_in_split(args: [GCodeArg], e_value: float) -> [GCodeArg]:
     e_value = round(e_value, 5)
     adjusted_arg = GCodeArg("E", str(e_value))
     for arg_n, arg in enumerate(args):
@@ -207,6 +206,10 @@ def set_e_in_split(args:[GCodeArg], e_value:float)->[GCodeArg]:
     return args
 
 
-def get_distance(point1:Point, point2:Point):
-    return sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2);
+def get_distance(point1: Point, point2: Point):
+    return sqrt((point1.x - point2.x)**2 + (point1.y - point2.y)**2)
+
+
+def should_add_extra_filament(current_travel: float, current_retraction: float, should_add_on_retraction: bool, should_add_on_no_retraction: bool) -> bool:
+    return current_travel != 0 and ((current_retraction != 0 and should_add_on_retraction) or (current_retraction == 0 and should_add_on_no_retraction))
 
