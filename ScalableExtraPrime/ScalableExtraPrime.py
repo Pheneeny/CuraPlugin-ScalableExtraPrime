@@ -81,10 +81,22 @@ class ScalableExtraPrime(Extension):
         self._enable_all_travels_key = "scalable_prime_enable_all_travels"
         self._enable_all_travels_dict = {
             "label": "Enable For All Travels",
-            "description": "Disabling this sets the slicer to only add extra filament after a retraction. If combing is enabled, travels over infill may not retract, and won't trigger extra prime.",
+            "description": "Disabling this sets the slicer to only add extra filament after a retraction. If combing is enabled, travels over infill may not retract, and won\'t trigger extra prime.",
             "type": "bool",
             "unit": "",
             "default_value": True,
+            "enabled": "scalable_prime_enable",
+            "settable_per_mesh": False,
+            "settable_per_extruder": False,
+            "settable_per_meshgroup": False,
+        }
+        self._enable_only_travels_key = "scalable_prime_enable_only_travels"
+        self._enable_only_travels_dict = {
+            "label": "Enable For Only Travels",
+            "description": "Enabling this sets the slicer to only add filament after regular travel moves (i.e. moves without a retraction). This is so that you can use this plugin in combination with the Retraction Extra Prime Amount setting.",
+            "type": "bool",
+            "unit": "",
+            "default_value": False,
             "enabled": "scalable_prime_enable",
             "settable_per_mesh": False,
             "settable_per_extruder": False,
@@ -119,12 +131,13 @@ class ScalableExtraPrime(Extension):
             # skip extruder definitions
             return
 
-        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "material")
+        self.create_and_attach_setting(container, self._setting_key, self._setting_dict, "travel")
         self.create_and_attach_setting(container, self._min_travel_key, self._min_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._max_travel_key, self._max_travel_dict, self._setting_key)
         self.create_and_attach_setting(container, self._min_prime_key, self._min_prime_dict, self._setting_key)
         self.create_and_attach_setting(container, self._max_prime_key, self._max_prime_dict, self._setting_key)
         self.create_and_attach_setting(container, self._enable_all_travels_key, self._enable_all_travels_dict, self._setting_key)
+        self.create_and_attach_setting(container, self._enable_only_travels_key, self._enable_only_travels_dict, self._setting_key)
 
     def _onGlobalContainerStackChanged(self):
         self._global_container_stack = self._application.getGlobalContainerStack()
@@ -142,6 +155,7 @@ class ScalableExtraPrime(Extension):
         min_prime = self._global_container_stack.getProperty(self._min_prime_key, "value")
         max_prime = self._global_container_stack.getProperty(self._max_prime_key, "value")
         extra_prime_without_retraction = self._global_container_stack.getProperty(self._enable_all_travels_key, "value")
+        extra_prime_only_travels = self._global_container_stack.getProperty(self._enable_only_travels_key, "value")
 
         gcode_dict = getattr(scene, "gcode_dict", {})
         if not gcode_dict:  # this also checks for an empty dict
@@ -155,7 +169,7 @@ class ScalableExtraPrime(Extension):
                 continue
 
             if ";EOFFSETPROCESSED" not in gcode_list[0]:
-                gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction)
+                gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction, extra_prime_only_travels)
 
                 gcode_list[0] += ";EOFFSETPROCESSED\n"
                 gcode_dict[plate_id] = gcode_list

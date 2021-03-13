@@ -8,7 +8,7 @@ Point = namedtuple('Point', 'x y')
 GCodeArg = namedtuple('GCodeArg', 'name value')
 
 
-def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:float, min_prime:float, max_prime:float, extra_prime_without_retraction:bool=True)->([str], float):
+def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:float, min_prime:float, max_prime:float, extra_prime_without_retraction:bool=True, extra_prime_only_travels:bool=False)->([str], float):
 
     last_point = None
 
@@ -83,7 +83,7 @@ def parse_and_adjust_gcode(gcode_layers:[[str]], min_travel:float, max_travel:fl
                     extra_move = None
 
                     #Check if this is the first extrude after a travel
-                    if current_travel != 0 and (current_retraction != 0 or extra_prime_without_retraction):
+                    if current_travel != 0 and ((current_retraction != 0 and not extra_prime_only_travels) or extra_prime_without_retraction or (current_retraction == 0 and extra_prime_only_travels)):
                         #Calculate extra prime based on travel distance
                         extra_e = round(get_extra_e(min_travel, max_travel, min_prime, max_prime, current_travel), 5)
                         adjusted_e += extra_e;

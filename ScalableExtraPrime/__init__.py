@@ -3,10 +3,10 @@
 
 from . import ScalableExtraPrime
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("ScalableExtraPrime")
+i18n_catalog = i18nCatalog('ScalableExtraPrime')
 
 def getMetaData():
     return {}
 
 def register(app):
-    return {"extension": ScalableExtraPrime.ScalableExtraPrime()}
+    return {'extension': ScalableExtraPrime.ScalableExtraPrime()}
