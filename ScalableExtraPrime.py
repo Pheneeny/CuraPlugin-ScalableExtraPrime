@@ -153,7 +153,10 @@ class ScalableExtraPrime(Extension):
             if len(gcode_list) < 2:
                 Logger.log("w", "Plate %s does not contain any layers", plate_id)
                 continue
-
+            for layer in gcode_list:
+                if "M83" in layer:
+                    Logger.log("e", "Scalable Extra Prime not supported in relative extrusion mode")
+                    return
             if ";EOFFSETPROCESSED" not in gcode_list[0]:
                 gcode_list = ScalableExtraPrimeAdjuster.parse_and_adjust_gcode(gcode_list, min_travel, max_travel, min_prime, max_prime, extra_prime_without_retraction)
 
