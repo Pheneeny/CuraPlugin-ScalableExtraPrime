@@ -1,3 +1,7 @@
+## This plugin is no longer being developed or updated and should not be used.
+
+## WARNING: This plugin does not work with relative extrusion. Use absolute extrusion only
+
 # ScalableExtraPrime
 
 A Cura plugin to add a scaling amount of extra filament extrusion after a travel.

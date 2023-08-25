@@ -117,6 +117,9 @@ def parse_and_adjust_gcode(gcode_layers: [[str]], min_travel: float, max_travel:
                         current_retraction = 0
 
                     last_e = current_e
+            elif command == 'M':
+                if command_value == '83':
+                    raise Exception("M83 found, plugin does not support relative extrusion")
         gcode_layers[layer] = "\n".join(lines)
     return gcode_layers
 
